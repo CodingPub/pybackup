@@ -33,7 +33,7 @@ def backup(src, dst_dir, retemtion_days):
 
 
 if __name__ == '__main__':
-    content = readfile('config.json')
+    content = readfile(joinPaths(cmddir(), 'config.json'))
     arr = str2Json(content)
     if arr and len(arr) > 0:
         for x in arr:
