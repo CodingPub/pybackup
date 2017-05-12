@@ -25,7 +25,7 @@ def backup(src, dst_dir, retemtion_days):
             should_delete = False
             if days >= retemtion_days:
                 should_delete = True
-            elif days >= 1 and dt.hour >= 1:
+            elif days >= 1 and dt.hour < 23:
                 should_delete = True
             if should_delete:
                 file = joinPaths(dst_dir, x)
