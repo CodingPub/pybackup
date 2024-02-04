@@ -8,20 +8,21 @@ from utility import *
 def backup(src, dst_dir, retemtion_days, hours_last_day=None):
     if hours_last_day is None:
         hours_last_day = 8
-
-    name = filename(src) + '_' + datetime.datetime.now().strftime('%Y%m%d%H' + fileExtension(src))
-    dst = joinPaths(dst_dir, name)
+    
+    name = Common.filename(src) + '-' + datetime.datetime.now().strftime('%Y%m%d%H' + Common.file_extension(src))
+    dst = Common.join_paths(dst_dir, name)
     print('backup %s to %s' % (src, dst))
-    createdir(dst_dir)
+    Common.create_dir(dst_dir)
 
-    cmd = 'rsync -aE --progress %s %s' % (src, dst)
-    systemCmd(cmd)
+    cmd = 'rsync -aE --progress \"%s\" \"%s\"' % (src, dst)
+    Common.system_cmd(cmd)
 
     # delete older backups
-    arr = [x for x in listdir(dst_dir) if x != '.DS_Store']
+    files = Common.list_dir(dst_dir) 
+    arr = [x for x in files if x != '.DS_Store']
     for x in arr:
-        name = filename(x)
-        t = name.split('_')
+        name = Common.filename(x)
+        t = name.split('-')
         if t and len(t) > 1:
             dt = datetime.datetime.strptime(t[1], '%Y%m%d%H')
             days = (datetime.datetime.now() - dt).days
@@ -35,19 +36,19 @@ def backup(src, dst_dir, retemtion_days, hours_last_day=None):
             elif days == 0 and dt.hour < 23 and (datetime.datetime.now() - dt).seconds > hours_last_day * 60 * 60:
                 should_delete = True
             if should_delete:
-                file = joinPaths(dst_dir, x)
-                remove(file)
+                file = Common.join_paths(dst_dir, x)
+                Common.remove(file)
 
 
 if __name__ == '__main__':
-    if isDebug():
+    if Common.debug():
         for day in range(0, 18):
             for hour in range(0, 24):
                 path = '/tmp/backup/config_201705%02d%02d.json' % (26 - day, hour)
-                replacefile('/Users/linxiaobin/Developer/python/backup/config.json', path)
+                Common.replace_file('/Users/linxiaobin/Developer/python/backup/config.json', path)
 
-    content = readfile(joinPaths(cmddir(), 'config.json'))
-    arr = str2Json(content)
+    content = Common.read_file(Common.join_paths(Common.get_cmd_dir(), 'config.json'))
+    arr = Common.str2json(content)
     if arr and len(arr) > 0:
         for x in arr:
             backup(x.get('src'), x.get('dst_dir'), x.get('retemtion_days'), hours_last_day=x.get('hours_last_day'))
